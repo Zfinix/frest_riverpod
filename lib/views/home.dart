@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:frest/models/repos_model.dart';
 import 'package:frest/models/token_model.dart';
 import 'package:frest/utils/margin.dart';
 import 'package:frest/widgets/loader.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'package:frest/utils/theme.dart';
 import 'package:frest/view_models/home_vm.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatefulHookWidget {
   final TokenModel tokenModel;
   const HomePage(this.tokenModel);
 
@@ -17,16 +18,17 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final providerMain = ChangeNotifierProvider((_) => HomeViewModel());
+
   @override
   void initState() {
-    var tempProvider = context.read<HomeViewModel>();
-    tempProvider.getRepos(context, widget?.tokenModel?.accessToken);
+    providerMain.read(context).getRepos(context, widget?.tokenModel?.accessToken);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    var provider = context.watch<HomeViewModel>();
+    var provider = useProvider(providerMain);
     return Scaffold(
       backgroundColor: bgColor,
       body: !provider.isLoading

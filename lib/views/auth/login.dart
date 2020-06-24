@@ -1,16 +1,17 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:frest/utils/margin.dart';
 import 'package:frest/utils/theme.dart';
 import 'package:frest/view_models/login_vm.dart';
 import 'package:frest/widgets/dialog.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:line_icons/line_icons.dart';
-import 'package:provider/provider.dart';
 
-class Login extends StatefulWidget {
+class Login extends StatefulHookWidget {
   Login({Key key}) : super(key: key);
 
   @override
@@ -18,17 +19,16 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  final wv = new FlutterWebviewPlugin();
+   final providerMain = ChangeNotifierProvider((_) => LoginViewModel());
 
-  StreamSubscription _onDestroy;
+  final wv = new FlutterWebviewPlugin();
   StreamSubscription<String> _onUrlChanged;
-  StreamSubscription<WebViewStateChanged> _onStateChanged;
 
   @override
   void dispose() {
-    _onDestroy.cancel();
+    //  _onDestroy.cancel();
     _onUrlChanged.cancel();
-    _onStateChanged.cancel();
+    // _onStateChanged.cancel();
     wv.dispose();
     super.dispose();
   }
@@ -36,19 +36,19 @@ class _LoginState extends State<Login> {
   @override
   void initState() {
     super.initState();
-    var tempProvider = context.read<LoginViewModel>();
-    tempProvider.loadKeys();
+    providerMain.read(context).loadKeys();
     wv.close();
     // Add a listener to on url changed
     _onUrlChanged = wv.onUrlChanged.listen((String url) async {
       print(url);
-      tempProvider.intercept(context, mounted, url, wv);
+      providerMain.read(context).intercept(context, url, mounted: mounted, wv: wv);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    var provider = context.watch<LoginViewModel>();
+    
+    var provider = useProvider(providerMain);
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(0),
@@ -105,7 +105,7 @@ class _LoginState extends State<Login> {
                   LineIcons.github,
                   color: white,
                 ),
-                label: Text('Sign in with Github '),
+                label: Text('Sign in with Github'),
                 onPressed: () async {
                   if (provider?.secretKeys?.clientId != null)
                     await customDialog(context,

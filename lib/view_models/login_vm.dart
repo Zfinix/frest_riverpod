@@ -11,8 +11,13 @@ class LoginViewModel extends ChangeNotifier {
 
   Secret secretKeys;
 
-  void intercept(BuildContext context, bool mounted, String url,
-      FlutterWebviewPlugin wv) async {
+  void intercept(
+    BuildContext context,
+    String url, {
+    bool mounted = true,
+    FlutterWebviewPlugin wv,
+    bool isTest = false,
+  }) async {
     try {
       if (mounted) {
         if (url.toLowerCase().contains('?cancelled=true')) {
@@ -20,8 +25,7 @@ class LoginViewModel extends ChangeNotifier {
           isLoading = true;
           secretKeys.code =
               url.replaceAll('https://flutterapp.com/callback?code=', '');
-
-          wv.close();
+          if (!isTest) wv.close();
           handleRequest(context);
         }
         isLoading = false;

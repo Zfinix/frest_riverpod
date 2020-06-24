@@ -23,7 +23,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  provider: 4.1.0-dev+3
+  flutter_hooks: ^0.10.0
+  hooks_riverpod: ^0.1.0
   line_icons: 0.2.0
   google_fonts: 1.0.0
   flutter_webview_plugin: 0.3.11

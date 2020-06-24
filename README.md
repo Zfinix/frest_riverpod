@@ -1,4 +1,4 @@
-# frest
+# frest_riverpod
 
 A Mobile Application that demostrates Github's OAuth.
 
